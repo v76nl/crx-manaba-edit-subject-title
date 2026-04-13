@@ -12,7 +12,8 @@ function applyTitles() {
       if (!href) return;
 
       // コースIDを抽出してキーにする（例: course_1234567）
-      const courseMatch = href.match(/course_\d+/);
+      // 末尾が$、/、?、#のいずれかであるもののみマッチさせ、_report 等への誤爆を防ぐ
+      const courseMatch = href.match(/course_\d+(?=$|[/?#])/);
       const key = courseMatch ? courseMatch[0] : href;
 
       // キーが登録されている場合に変更
@@ -106,7 +107,7 @@ document.addEventListener(
       const href = link.getAttribute("href");
       if (href) {
         // コースIDを抽出してキーにする
-        const courseMatch = href.match(/course_\d+/);
+        const courseMatch = href.match(/course_\d+(?=$|[/?#])/);
         const key = courseMatch ? courseMatch[0] : href;
 
         const currentName = link.textContent.trim();
@@ -136,7 +137,7 @@ document.addEventListener(
                 .forEach((a) => {
                   const aHref = a.getAttribute("href");
                   if (aHref) {
-                    const aMatch = aHref.match(/course_\d+/);
+                    const aMatch = aHref.match(/course_\d+(?=$|[/?#])/);
                     const aKey = aMatch ? aMatch[0] : aHref;
                     if (aKey === key) {
                       a.textContent = newName.trim();
