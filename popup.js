@@ -15,3 +15,44 @@ document.getElementById('editBtn').addEventListener('click', async () => {
     });
   }
 });
+
+// 置換セットの表示
+function loadReplaceList() {
+  chrome.storage.local.get(['subjectTitles'], (result) => {
+    const titles = result.subjectTitles || {};
+    const listEl = document.getElementById('replaceList');
+    listEl.innerHTML = '';
+    
+    const keys = Object.keys(titles);
+    if (keys.length === 0) {
+      listEl.innerHTML = '<li class="empty-msg">設定はありません</li>';
+      return;
+    }
+    
+    keys.forEach(key => {
+      const li = document.createElement('li');
+      li.className = 'replace-item';
+      
+      const span = document.createElement('span');
+      span.className = 'item-name';
+      span.textContent = titles[key];
+      span.title = titles[key] + ' (' + key + ')';
+      
+      const delBtn = document.createElement('button');
+      delBtn.className = 'delete-btn';
+      delBtn.textContent = '削除';
+      delBtn.addEventListener('click', () => {
+        delete titles[key];
+        chrome.storage.local.set({ subjectTitles: titles }, () => {
+          loadReplaceList(); // 要素の削除後に再読み込み
+        });
+      });
+      
+      li.appendChild(span);
+      li.appendChild(delBtn);
+      listEl.appendChild(li);
+    });
+  });
+}
+
+document.addEventListener('DOMContentLoaded', loadReplaceList);

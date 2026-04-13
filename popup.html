@@ -8,7 +8,6 @@
       width: 250px;
       padding: 15px;
       font-family: sans-serif;
-      text-align: center;
     }
     button {
       width: 100%;
@@ -27,14 +26,69 @@
     p {
       font-size: 13px;
       color: #333;
-      margin: 0;
+      margin: 0 0 10px 0;
       line-height: 1.4;
+      text-align: center;
+    }
+    hr {
+      margin: 15px 0;
+      border: none;
+      border-top: 1px solid #ccc;
+    }
+    h3 {
+      font-size: 14px;
+      margin: 0 0 10px 0;
+      text-align: center;
+    }
+    #replaceList {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      max-height: 150px;
+      overflow-y: auto;
+    }
+    .replace-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 5px;
+      border-bottom: 1px solid #eee;
+      font-size: 12px;
+    }
+    .replace-item:last-child {
+      border-bottom: none;
+    }
+    .item-name {
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 160px;
+    }
+    .delete-btn {
+      width: auto;
+      padding: 2px 6px;
+      margin-top: 0;
+      background-color: #dc3545;
+      font-size: 11px;
+    }
+    .delete-btn:hover {
+      background-color: #c82333;
+    }
+    .empty-msg {
+      text-align: center;
+      font-size: 12px;
+      color: #777;
     }
   </style>
 </head>
 <body>
   <p>編集したい科目をページ上でクリックして、新しい名前を設定できます。</p>
   <button id="editBtn">科目名を編集する</button>
+  
+  <hr>
+  <h3>現在の置換設定</h3>
+  <ul id="replaceList"></ul>
+
   <script src="popup.js"></script>
 </body>
 </html>
