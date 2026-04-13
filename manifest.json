@@ -1,0 +1,23 @@
+{
+  "manifest_version": 3,
+  "name": "manaba subject title editor",
+  "version": "1.0",
+  "description": "manabaの科目のタイトルを編集します。",
+  "permissions": [
+    "storage"
+  ],
+  "action": {
+    "default_popup": "popup.html"
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "https://room.chuo-u.ac.jp/ct/*"
+      ],
+      "js": [
+        "content.js"
+      ],
+      "run_at": "document_end"
+    }
+  ]
+}
