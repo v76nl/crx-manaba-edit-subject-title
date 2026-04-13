@@ -4,7 +4,7 @@ let selectionMode = false;
 function applyTitles() {
   chrome.storage.local.get(['subjectTitles'], (result) => {
     const titles = result.subjectTitles || {};
-    const links = document.querySelectorAll('a');
+    const links = document.querySelectorAll('a:not(.courseweekly-fav):not(.courselist-fav)');
     links.forEach(link => {
       const href = link.getAttribute('href');
       if (!href) return;
@@ -65,7 +65,7 @@ document.head.appendChild(style);
 // マウスオーバー時の枠線表示
 document.addEventListener('mouseover', (e) => {
   if (!selectionMode) return;
-  const link = e.target.closest('a');
+  const link = e.target.closest('a:not(.courseweekly-fav):not(.courselist-fav)');
   if (link) {
     link.classList.add('manaba-edit-subject-hover');
   }
@@ -73,7 +73,7 @@ document.addEventListener('mouseover', (e) => {
 
 document.addEventListener('mouseout', (e) => {
   if (!selectionMode) return;
-  const link = e.target.closest('a');
+  const link = e.target.closest('a:not(.courseweekly-fav):not(.courselist-fav)');
   if (link) {
     link.classList.remove('manaba-edit-subject-hover');
   }
@@ -83,7 +83,7 @@ document.addEventListener('mouseout', (e) => {
 document.addEventListener('click', (e) => {
   if (!selectionMode) return;
   
-  const link = e.target.closest('a');
+  const link = e.target.closest('a:not(.courseweekly-fav):not(.courselist-fav)');
   if (link) {
     e.preventDefault();
     e.stopPropagation();
@@ -110,7 +110,7 @@ document.addEventListener('click', (e) => {
           } else {
             titles[key] = newName.trim();
             // 即座に画面上の表示を更新
-            document.querySelectorAll('a').forEach(a => {
+            document.querySelectorAll('a:not(.courseweekly-fav):not(.courselist-fav)').forEach(a => {
               const aHref = a.getAttribute('href');
               if (aHref) {
                 const aMatch = aHref.match(/course_\d+/);
