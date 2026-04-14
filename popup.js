@@ -7,7 +7,7 @@ document.getElementById('editBtn').addEventListener('click', async () => {
       if (chrome.runtime.lastError) {
         // content.jsが読み込まれていない可能性がある場合
         console.error(chrome.runtime.lastError);
-        alert('エラーが発生しました。\n・manabaのページ（https://room.chuo-u.ac.jp/ct/*）を開いているか確認してください。\n・ページを一度リロードしてから再試行してください。');
+        showPopupError('manabaのページを開いてからリロードして再試行してください。');
       } else {
         // メッセージ送信成功時にポップアップを閉じる
         window.close();
@@ -56,3 +56,14 @@ function loadReplaceList() {
 }
 
 document.addEventListener('DOMContentLoaded', loadReplaceList);
+
+/**
+ * ポップアップ内にエラーメッセージを表示する
+ * @param {string} message 表示するエラーメッセージ
+ */
+function showPopupError(message) {
+  const el = document.getElementById('errorMsg');
+  if (!el) return;
+  el.textContent = message;
+  el.hidden = false;
+}

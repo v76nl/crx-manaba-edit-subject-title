@@ -79,11 +79,22 @@
       font-size: 12px;
       color: #777;
     }
+    #errorMsg {
+      margin-top: 10px;
+      padding: 8px 10px;
+      border-radius: 4px;
+      background-color: #fde8ea;
+      color: #c0392b;
+      font-size: 12px;
+      line-height: 1.5;
+      border: 1px solid #f5c6cb;
+    }
   </style>
 </head>
 <body>
   <p>編集したい科目をページ上でクリックして、新しい名前を設定できます。</p>
   <button id="editBtn">科目名を編集する</button>
+  <div id="errorMsg" hidden></div>
   
   <hr>
   <h3>現在の置換設定</h3>

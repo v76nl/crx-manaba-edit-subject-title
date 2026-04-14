@@ -49,23 +49,78 @@ observer.observe(document.body, { childList: true, subtree: true });
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   if (request.action === "enterSelectionMode") {
     selectionMode = true;
-    alert(
-      "【科目名編集モード】\n編集したい科目名（リンク）をクリックしてください。",
-    );
     document.body.style.cursor = "crosshair";
+    showToast("✏️ 科目名編集モード: 編集したい科目をクリックしてください", "info", 4000);
+    sendResponse({ ok: true }); // lastError を防ぐためレスポンスを返す
   }
 });
 
-// ホバー時のスタイル定義
+// ===== スタイル定義テンプレート =====
+// ホバーハイライト + トースト通知のスタイルをまとめて定義
 const style = document.createElement("style");
 style.textContent = `
+  /* 編集モード中のホバーハイライト */
   .manaba-edit-subject-hover {
     outline: 2px dashed #ff0000 !important;
     background-color: rgba(255, 0, 0, 0.2) !important;
     border-radius: 4px;
   }
+
+  /* トースト通知 — 共通テンプレート */
+  .manaba-toast {
+    position: fixed;
+    bottom: 24px;
+    left: 50%;
+    transform: translateX(-50%) translateY(12px);
+    padding: 10px 20px;
+    border-radius: 6px;
+    font-size: 14px;
+    font-family: sans-serif;
+    color: #fff;
+    background: rgba(30, 30, 30, 0.92);
+    box-shadow: 0 4px 16px rgba(0,0,0,0.28);
+    white-space: nowrap;
+    opacity: 0;
+    pointer-events: none;
+    z-index: 2147483647;
+    transition: opacity 0.25s ease, transform 0.25s ease;
+  }
+  .manaba-toast.manaba-toast--show {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+  /* バリアント */
+  .manaba-toast--info    { background: rgba(0, 102, 204, 0.92); }
+  .manaba-toast--success { background: rgba(40, 167, 69, 0.92); }
+  .manaba-toast--warning { background: rgba(220, 53, 69, 0.92); }
 `;
 document.head.appendChild(style);
+
+/**
+ * トースト通知を表示するユーティリティ（再利用可能テンプレート）
+ * @param {string} message  表示するメッセージ
+ * @param {'info'|'success'|'warning'} variant  スタイルバリアント（省略時: info）
+ * @param {number} duration  表示時間(ms)（省略時: 3000ms）
+ */
+function showToast(message, variant = "info", duration = 3000) {
+  const toast = document.createElement("div");
+  toast.className = `manaba-toast manaba-toast--${variant}`;
+  toast.textContent = message;
+  document.body.appendChild(toast);
+
+  // フレームを挟んでアニメーション開始
+  requestAnimationFrame(() => {
+    requestAnimationFrame(() => {
+      toast.classList.add("manaba-toast--show");
+    });
+  });
+
+  // 指定時間後にフェードアウトして削除
+  setTimeout(() => {
+    toast.classList.remove("manaba-toast--show");
+    toast.addEventListener("transitionend", () => toast.remove(), { once: true });
+  }, duration);
+}
 
 // マウスオーバー時の枠線表示
 document.addEventListener("mouseover", (e) => {
@@ -124,9 +179,7 @@ document.addEventListener(
 
             if (newName.trim() === "") {
               delete titles[key];
-              alert(
-                "カスタム名称を削除しました。ページをリロードすると元の名前に戻ります。",
-              );
+              showToast("カスタム名称を削除しました（リロードで元の名前に戻ります）", "warning", 3000);
             } else {
               titles[key] = newName.trim();
               // 即座に画面上の表示を更新
@@ -156,18 +209,10 @@ document.addEventListener(
       selectionMode = false;
       document.body.style.cursor = "";
     } else {
-      // リンク以外をクリックした場合もモード終了とみなすか確認する
-      if (
-        confirm(
-          "科目名の選択がキャンセルされました。編集モードを終了しますか？",
-        )
-      ) {
-        selectionMode = false;
-        document.body.style.cursor = "";
-      } else {
-        e.preventDefault();
-        e.stopPropagation();
-      }
+      // リンク以外をクリックした場合は編集モードを終了
+      selectionMode = false;
+      document.body.style.cursor = "";
+      showToast("編集モードを終了しました", "warning", 2500);
     }
   },
   true,
