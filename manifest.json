@@ -15,6 +15,7 @@
         "https://room.chuo-u.ac.jp/ct/*"
       ],
       "js": [
+        "toast.js",
         "content.js"
       ],
       "run_at": "document_end"
