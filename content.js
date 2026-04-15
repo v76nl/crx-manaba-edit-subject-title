@@ -16,7 +16,15 @@ function isValidSubjectLink(link) {
 // ページ読み込み時や動的変更時にタイトルを適用
 function applyTitles() {
     chrome.storage.local.get(["subjectTitles"], (result) => {
-        const titles = result.subjectTitles || {};
+        // ユーザーが設定したタイトルを取得
+        const userTitles = result.subjectTitles || {};
+        
+        // デフォルト設定が存在する場合のみマージ（エラー回避のフォールバック）
+        const defaultTitles = typeof DEFAULT_SUBJECT_TITLES !== 'undefined' ? DEFAULT_SUBJECT_TITLES : {};
+        
+        // デフォルト設定とユーザー設定をマージ（ユーザー設定が優先）
+        const titles = { ...defaultTitles, ...userTitles };
+
         const links = document.querySelectorAll(
             "a:not(.courseweekly-fav):not(.courselist-fav)",
         );
@@ -66,7 +74,9 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     if (request.action === "enterSelectionMode") {
         selectionMode = true;
         document.body.style.cursor = "crosshair";
-        showToast("✏️ 科目名編集モード: 編集したい科目をクリックしてください", "info", 4000);
+        if (typeof showToast === "function") {
+            showToast("✏️ 科目名編集モード: 編集したい科目をクリックしてください", "info", 4000);
+        }
         sendResponse({ ok: true }); // lastError を防ぐためレスポンスを返す
     }
 });
@@ -143,7 +153,9 @@ document.addEventListener(
 
                         if (newName.trim() === "") {
                             delete titles[key];
-                            showToast("カスタム名称を削除しました（リロードで元の名前に戻ります）", "warning", 3000);
+                            if (typeof showToast === "function") {
+                                showToast("カスタム名称を削除しました（リロードで元の名前に戻ります）", "warning", 3000);
+                            }
                         } else {
                             titles[key] = newName.trim();
                             // 即座に画面上の表示を更新
@@ -179,7 +191,9 @@ document.addEventListener(
             // 対象外のリンクや、リンク以外をクリックした場合は編集モードを終了
             selectionMode = false;
             document.body.style.cursor = "";
-            showToast("編集モードを終了しました", "warning", 2500);
+            if (typeof showToast === "function") {
+                showToast("編集モードを終了しました", "warning", 2500);
+            }
         }
     },
     true,

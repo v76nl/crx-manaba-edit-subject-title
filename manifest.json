@@ -16,6 +16,7 @@
       ],
       "js": [
         "toast.js",
+        "default_titles.js",
         "content.js"
       ],
       "run_at": "document_end"
