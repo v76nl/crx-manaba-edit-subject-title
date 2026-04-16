@@ -1,6 +1,6 @@
 let selectionMode = false;
 
-// リンクが置換・編集の対象として有効か判定する関数
+// リンクが置換・編集の対象として有効か判定
 function isValidSubjectLink(link) {
     // img要素を含む場合は対象外
     if (link.querySelector("img") !== null) {
@@ -19,10 +19,10 @@ function applyTitles() {
         // ユーザーが設定したタイトルを取得
         const userTitles = result.subjectTitles || {};
         
-        // デフォルト設定が存在する場合のみマージ（エラー回避のフォールバック）
+        // デフォルト設定が存在する場合のみmerge
         const defaultTitles = typeof DEFAULT_SUBJECT_TITLES !== 'undefined' ? DEFAULT_SUBJECT_TITLES : {};
         
-        // デフォルト設定とユーザー設定をマージ（ユーザー設定が優先）
+        // デフォルト設定とユーザー設定をmerge（ユーザー設定が優先）
         const titles = { ...defaultTitles, ...userTitles };
 
         const links = document.querySelectorAll(
@@ -35,7 +35,7 @@ function applyTitles() {
             const href = link.getAttribute("href");
             if (!href) return;
 
-            // コースIDを抽出してキーにする（例: course_1234567）
+            // コースIDを抽出
             // 末尾が$、/、?、#のいずれかであるもののみマッチさせ、_report 等への誤爆を防ぐ
             const courseMatch = href.match(/course_\d+(?=$|[/?#])/);
             const key = courseMatch ? courseMatch[0] : href;
@@ -69,19 +69,18 @@ const observer = new MutationObserver((mutations) => {
 });
 observer.observe(document.body, { childList: true, subtree: true });
 
-// Popupからのメッセージ受信
+// popupからのメッセージ受信
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     if (request.action === "enterSelectionMode") {
         selectionMode = true;
         document.body.style.cursor = "crosshair";
         if (typeof showToast === "function") {
-            showToast("✏️ 科目名編集モード: 編集したい科目をクリックしてください", "info", 4000);
+            showToast("科目名編集モード: 編集したい科目をクリックしてください", "info", 4000);
         }
         sendResponse({ ok: true }); // lastError を防ぐためレスポンスを返す
     }
 });
 
-// ===== 固有スタイル定義 =====
 const style = document.createElement("style");
 style.textContent = `
     /* 編集モード中のホバーハイライト */
@@ -99,7 +98,7 @@ document.addEventListener("mouseover", (e) => {
     const link = e.target.closest(
         "a:not(.courseweekly-fav):not(.courselist-fav)",
     );
-    // 対象のリンク要素のみハイライトを適用
+
     if (link && isValidSubjectLink(link)) {
         link.classList.add("manaba-edit-subject-hover");
     }
@@ -115,7 +114,7 @@ document.addEventListener("mouseout", (e) => {
     }
 });
 
-// コースリンククリック時の処理（編集モード時）
+// 編集モード中のコースリンククリック時の処理
 document.addEventListener(
     "click",
     (e) => {
@@ -135,7 +134,7 @@ document.addEventListener(
 
             const href = link.getAttribute("href");
             if (href) {
-                // コースIDを抽出してキーにする
+                // コースIDを抽出
                 const courseMatch = href.match(/course_\d+(?=$|[/?#])/);
                 const key = courseMatch ? courseMatch[0] : href;
 
@@ -154,7 +153,7 @@ document.addEventListener(
                         if (newName.trim() === "") {
                             delete titles[key];
                             if (typeof showToast === "function") {
-                                showToast("カスタム名称を削除しました（リロードで元の名前に戻ります）", "warning", 3000);
+                                showToast("カスタム名称を削除しました（ページ再読み込みで元の名前に戻ります）", "warning", 3000);
                             }
                         } else {
                             titles[key] = newName.trim();
@@ -178,7 +177,6 @@ document.addEventListener(
                                 });
                         }
 
-                        // ストレージに保存
                         chrome.storage.local.set({ subjectTitles: titles });
                     });
                 }
